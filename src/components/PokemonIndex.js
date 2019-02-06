@@ -9,7 +9,8 @@ const API = 'http://localhost:3000/pokemon'
 export default class PokemonPage extends Component {
 
   state = {
-    pokemon: []  
+    pokemon: [],
+    searchTerm: ''
   }
 
   fetchPokemon = async(API) => {
@@ -46,25 +47,32 @@ export default class PokemonPage extends Component {
     }
   }
 
-  filteredPokemon = (event) => {
-    event.persist()
-    const searchInput = event.target.value
+  filteredPokemon = (value) => {
     const copyPokemon = [...this.state.pokemon]
+    if (value === '') {
+      return copyPokemon
+    }
+    const filteredPokemon = copyPokemon.filter( pokemon => pokemon.name.includes(value))
+    console.log(filteredPokemon)
+    return filteredPokemon
+  }
+
+  setSearchState = (value) => {
+    const searchInput = value
+    console.log(searchInput)
     this.setState({
       searchTerm: searchInput
     })
-    return copyPokemon.filter( pokemon => pokemon.name.includes(searchInput ))
   }
-
 
   render() {
     return (
       <div>
         <h1>Pokemon Searcher</h1>
         <br />
-        <Search onSearchChange={_.debounce(() => console.log('🤔'), 500)} showNoResults={false} />
+        <Search onSearchChange={ (event) => this.setSearchState(event.target.value) } />
         <br />
-        <PokemonCollection pokemonToRender={this.state.pokemon} />
+        <PokemonCollection pokemonToRender={this.filteredPokemon(this.state.searchTerm)} />
         <br />
         <PokemonForm />
       </div>
